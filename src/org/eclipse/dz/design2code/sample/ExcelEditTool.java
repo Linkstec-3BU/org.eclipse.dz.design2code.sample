@@ -51,7 +51,7 @@ public class ExcelEditTool extends Application {
 		TableView<EditArea> table = new TableView<>();
 		table.setEditable(true);
 
-		// 番号
+		// 番号列設定
 		TableColumn<EditArea, EditArea> numberCol = new TableColumn<>("No");
 		numberCol.setMinWidth(20);
 		numberCol.setCellValueFactory(new Callback<CellDataFeatures<EditArea, EditArea>, ObservableValue<EditArea>>() {
@@ -83,11 +83,7 @@ public class ExcelEditTool extends Application {
 
 		ContextMenu logicContext = new ContextMenu();
 
-		MenuItem[] items1 = new MenuItem[] { new MenuItem("行追加"), new MenuItem("行削除")
-				// ,new MenuItem("行コピー"),
-				// new MenuItem("行切り取り"),
-				// new MenuItem("行貼り付け")
-		};
+		MenuItem[] items1 = new MenuItem[] { new MenuItem("行追加"), new MenuItem("行削除")};
 
 		Menu addLogicMenu = new Menu("処理内容追加");
 		addLogicMenu.getItems().add(new MenuItem("処理内容1(セット)"));
@@ -197,7 +193,6 @@ public class ExcelEditTool extends Application {
 					editAreaData.add(index, edit);
 				});
 			}
-
 		}
 	}
 
@@ -213,7 +208,7 @@ public class ExcelEditTool extends Application {
 				subMenu.setOnAction(ex -> {
 					for (int j = index; j < editAreaData.size(); j++) {
 						EditArea edit = editAreaData.get(j);
-						if (edit.getFlg() != "IF") {
+						if (!"IF".equals(edit.getFlg().substring(0,2))) {
 							break;
 						}
 						ifLogicData.add(edit);
@@ -254,31 +249,6 @@ public class ExcelEditTool extends Application {
 					editAreaData.remove(index);
 				});
 			}
-			// else if (subMenu.getText() == "行コピー") {
-			// subMenu.setOnAction(ex -> {
-			// Clipboard clipboard = Clipboard.getSystemClipboard();
-			// ClipboardContent content = new ClipboardContent();
-			// StringBuilder clipboardString = new StringBuilder();
-			//
-			//
-			// EditArea area = editAreaData.get(index);
-			//
-			// clipboard.setContent(content);
-			// });
-			// } else if (subMenu.getText() == "行切り取り") {
-			// subMenu.setOnAction(ex -> {
-			// //TODO
-			//// EditArea area = editAreaData.get(index);
-			//// editAreaData.remove(index);
-			// });
-			// }else if (subMenu.getText() == "行貼り付け") {
-			// subMenu.setOnAction(ex -> {
-			// //TODO
-			//// EditArea edit = new EditArea("", "", "", "", "");
-			//// editAreaData.add(index, edit);
-			// });
-			// }
-
 		}
 	}
 
@@ -298,9 +268,15 @@ public class ExcelEditTool extends Application {
 
 		newStage.setTitle("項目選択");
 
+		Label label1 = new Label("項目1を入力してください:");
+		label1.setMaxSize(200, 20);
 		TextField text1 = new TextField();
+		text1.setMaxSize(200, 20);
+		Label label2 = new Label("項目2を入力してください:");
+		label2.setMaxSize(200, 20);
 		TextField text2 = new TextField();
-
+		text2.setMaxSize(200, 20);
+		
 		Button btn = new Button();
 		btn.setText("登録");
 		btn.setOnAction(e -> {
@@ -319,7 +295,7 @@ public class ExcelEditTool extends Application {
 		vbox.setSpacing(5);
 		vbox.setPadding(new Insets(10, 10, 10, 10));
 
-		vbox.getChildren().addAll(text1, text2, btn);
+		vbox.getChildren().addAll(label1,text1,label2, text2, btn);
 
 		newStage.setScene(new Scene(vbox));
 		newStage.show();
@@ -334,18 +310,35 @@ public class ExcelEditTool extends Application {
 
 		newStage.setTitle("項目選択");
 
+		Label label1 = new Label("条件を入力してください:");
+		label1.setMaxSize(200, 20);
 		TextField text1 = new TextField();
-		TextField text2 = new TextField();
+		text1.setMaxSize(200, 20);
+		
 
 		Button btn = new Button();
 		btn.setText("登録");
 		btn.setOnAction(e -> {
-
-			ObservableList<EditArea> ifLogicData = FXCollections.observableArrayList(
-					new EditArea("IF", "IF", "", "", text1.getText(), ""), new EditArea("IF", "", "", "", "", ""),
-					new EditArea("IF", "", "", "", "", ""), new EditArea("IF", "ELSE", "", "", "", ""),
-					new EditArea("IF", "", "", "", "", ""), new EditArea("IF", "", "", "", "", ""),
-					new EditArea("IF", "END", "", "", "", ""));
+			EditArea edit = editAreaData.get(index);
+			String flg =edit.getFlg();
+			ObservableList<EditArea> ifLogicData = FXCollections.observableArrayList();
+			if (flg == "IF") {				
+				ifLogicData.addAll(new EditArea("IF2", "", "IF", "", text1.getText(), ""), new EditArea("IF2", "", "", "", "", ""),
+						new EditArea("IF2", "", "", "", "", ""), new EditArea("IF2", "", "ELSE", "", "", ""),
+						new EditArea("IF2", "", "", "", "", ""), new EditArea("IF2", "", "", "", "", ""),
+						new EditArea("IF2", "", "END", "", "", ""));
+			} else if (flg == "IF2") {
+				ifLogicData.addAll(new EditArea("IF3", "", "", "IF", text1.getText(), ""), new EditArea("IF3", "", "", "", "", ""),
+						new EditArea("IF3", "", "", "", "", ""), new EditArea("IF3", "", "", "ELSE", "", ""),
+						new EditArea("IF3", "", "", "", "", ""), new EditArea("IF3", "", "", "", "", ""),
+						new EditArea("IF3", "", "", "END", "", ""));
+			} else {
+				ifLogicData.addAll(new EditArea("IF", "IF", "", "", text1.getText(), ""), new EditArea("IF", "", "", "", "", ""),
+						new EditArea("IF", "", "", "", "", ""), new EditArea("IF", "ELSE", "", "", "", ""),
+						new EditArea("IF", "", "", "", "", ""), new EditArea("IF", "", "", "", "", ""),
+						new EditArea("IF", "END", "", "", "", ""));
+			}
+			
 
 			editAreaData.addAll(index, ifLogicData);
 			newStage.close();
@@ -355,7 +348,7 @@ public class ExcelEditTool extends Application {
 		vbox.setSpacing(5);
 		vbox.setPadding(new Insets(10, 10, 10, 10));
 
-		vbox.getChildren().addAll(text1, text2, btn);
+		vbox.getChildren().addAll(label1,text1, btn);
 
 		newStage.setScene(new Scene(vbox));
 		newStage.show();
@@ -370,9 +363,11 @@ public class ExcelEditTool extends Application {
 
 		newStage.setTitle("項目選択");
 
+		Label label1 = new Label("対象リスト項目を入力してください:");
+		label1.setMaxSize(200, 20);
 		TextField text1 = new TextField();
-		TextField text2 = new TextField();
-
+		text1.setMaxSize(200, 20);
+		
 		Button btn = new Button();
 		btn.setText("登録");
 		btn.setOnAction(e -> {
@@ -390,7 +385,7 @@ public class ExcelEditTool extends Application {
 		vbox.setSpacing(5);
 		vbox.setPadding(new Insets(10, 10, 10, 10));
 
-		vbox.getChildren().addAll(text1, text2, btn);
+		vbox.getChildren().addAll(label1,text1, btn);
 
 		newStage.setScene(new Scene(vbox));
 		newStage.show();
@@ -406,8 +401,14 @@ public class ExcelEditTool extends Application {
 
 		newStage.setTitle("項目選択");
 
+		Label label1 = new Label("項目1を入力してください:");
+		label1.setMaxSize(200, 20);
 		TextField text1 = new TextField();
+		text1.setMaxSize(200, 20);
+		Label label2 = new Label("項目2を入力してください:");
+		label2.setMaxSize(200, 20);
 		TextField text2 = new TextField();
+		text2.setMaxSize(200, 20);
 
 		Button btn = new Button();
 		btn.setText("登録");
